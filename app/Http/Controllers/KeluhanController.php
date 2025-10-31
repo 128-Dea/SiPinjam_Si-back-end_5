@@ -3,69 +3,60 @@
 namespace App\Http\Controllers;
 
 use App\Models\Keluhan;
+use App\Models\Pengguna;
+use App\Models\Barang;
 use Illuminate\Http\Request;
 
 class KeluhanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $keluhans = Keluhan::all();
-        return response()->json($keluhans);
+        $keluhans = Keluhan::with(['pengguna', 'barang'])->latest()->paginate(10);
+        return view('keluhan.index', compact('keluhans'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function create()
+    {
+        $pengguna = Pengguna::all();
+        $barang = Barang::all();
+        return view('keluhan.create', compact('pengguna', 'barang'));
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'pengguna_id' => 'required|exists:pengguna,id',
             'barang_id' => 'required|exists:barang,id',
             'deskripsi_keluhan' => 'required|string',
             'status' => 'required|in:pending,diproses,selesai',
         ]);
 
-        $keluhan = Keluhan::create($request->all());
-        return response()->json($keluhan, 201);
+        Keluhan::create($validated);
+
+        return redirect()->route('keluhan.index')->with('success', 'Keluhan berhasil ditambahkan');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Keluhan $keluhan)
     {
-        $keluhan = Keluhan::findOrFail($id);
-        return response()->json($keluhan);
+        $pengguna = Pengguna::all();
+        $barang = Barang::all();
+        return view('keluhan.edit', compact('keluhan', 'pengguna', 'barang'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Keluhan $keluhan)
     {
-        $keluhan = Keluhan::findOrFail($id);
-
-        $request->validate([
-            'pengguna_id' => 'sometimes|required|exists:pengguna,id',
-            'barang_id' => 'sometimes|required|exists:barang,id',
+        $validated = $request->validate([
             'deskripsi_keluhan' => 'sometimes|required|string',
-            'status' => 'sometimes|required|in:pending,diproses,selesai',
+            'status' => 'required|in:pending,diproses,selesai',
         ]);
 
-        $keluhan->update($request->all());
-        return response()->json($keluhan);
+        $keluhan->update($validated);
+        return redirect()->route('keluhan.index')->with('success', 'Keluhan berhasil diperbarui');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Keluhan $keluhan)
     {
-        $keluhan = Keluhan::findOrFail($id);
         $keluhan->delete();
-        return response()->json(['message' => 'Keluhan deleted successfully']);
+        return redirect()->route('keluhan.index')->with('success', 'Keluhan berhasil dihapus');
     }
 }

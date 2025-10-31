@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Perpanjangan;
-use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 
 class PerpanjanganController extends Controller
 {
     public function index()
     {
-        $perpanjangans = Perpanjangan::with('peminjaman')->latest()->paginate(10);
-        return view('perpanjangan.index', compact('perpanjangans'));
-    }
+        $perpanjangans = Perpanjangan::with('peminjaman')->latest()->get();
 
-    public function create()
-    {
-        $peminjaman = Peminjaman::all();
-        return view('perpanjangan.create', compact('peminjaman'));
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar perpanjangan berhasil diambil.',
+            'data' => $perpanjangans
+        ]);
     }
 
     public function store(Request $request)
@@ -29,21 +28,24 @@ class PerpanjanganController extends Controller
             'status' => 'required|in:pending,disetujui,ditolak',
         ]);
 
-        Perpanjangan::create($validated);
+        $perpanjangan = Perpanjangan::create($validated);
 
-        return redirect()->route('perpanjangan.index')->with('success', 'Perpanjangan berhasil ditambahkan.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Perpanjangan berhasil disimpan.',
+            'data' => $perpanjangan
+        ], 201);
     }
 
     public function show(Perpanjangan $perpanjangan)
     {
         $perpanjangan->load('peminjaman');
-        return view('perpanjangan.show', compact('perpanjangan'));
-    }
 
-    public function edit(Perpanjangan $perpanjangan)
-    {
-        $peminjaman = Peminjaman::all();
-        return view('perpanjangan.edit', compact('perpanjangan', 'peminjaman'));
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail perpanjangan berhasil diambil.',
+            'data' => $perpanjangan
+        ]);
     }
 
     public function update(Request $request, Perpanjangan $perpanjangan)
@@ -57,12 +59,20 @@ class PerpanjanganController extends Controller
 
         $perpanjangan->update($validated);
 
-        return redirect()->route('perpanjangan.index')->with('success', 'Data perpanjangan berhasil diperbarui.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Perpanjangan berhasil diperbarui.',
+            'data' => $perpanjangan
+        ]);
     }
 
     public function destroy(Perpanjangan $perpanjangan)
     {
         $perpanjangan->delete();
-        return redirect()->route('perpanjangan.index')->with('success', 'Data perpanjangan berhasil dihapus.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Perpanjangan berhasil dihapus.'
+        ]);
     }
 }

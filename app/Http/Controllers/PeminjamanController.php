@@ -3,75 +3,72 @@
 namespace App\Http\Controllers;
 
 use App\Models\Peminjaman;
+use App\Models\Pengguna;
+use App\Models\Barang;
 use Illuminate\Http\Request;
 
 class PeminjamanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $peminjamans = Peminjaman::all();
-        return response()->json($peminjamans);
+        $peminjamans = Peminjaman::with(['pengguna', 'barang'])->latest()->paginate(10);
+        return view('peminjaman.index', compact('peminjamans'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function create()
+    {
+        $pengguna = Pengguna::all();
+        $barang = Barang::where('status', 'tersedia')->get();
+        return view('peminjaman.create', compact('pengguna', 'barang'));
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'pengguna_id' => 'required|exists:pengguna,id',
             'barang_id' => 'required|exists:barang,id',
             'tanggal_pinjam' => 'required|date',
             'tanggal_kembali' => 'required|date|after:tanggal_pinjam',
+            'catatan' => 'nullable|string',
+        ]);
+
+        $validated['status'] = 'dipinjam';
+        Peminjaman::create($validated);
+
+        // update status barang jadi 'dipinjam'
+        Barang::where('id', $validated['barang_id'])->update(['status' => 'dipinjam']);
+
+        return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil ditambahkan');
+    }
+
+    public function edit(Peminjaman $peminjaman)
+    {
+        $pengguna = Pengguna::all();
+        $barang = Barang::all();
+        return view('peminjaman.edit', compact('peminjaman', 'pengguna', 'barang'));
+    }
+
+    public function update(Request $request, Peminjaman $peminjaman)
+    {
+        $validated = $request->validate([
+            'tanggal_kembali' => 'sometimes|required|date|after_or_equal:tanggal_pinjam',
             'tanggal_dikembalikan' => 'nullable|date',
             'status' => 'required|in:pending,dipinjam,dikembalikan',
             'catatan' => 'nullable|string',
         ]);
 
-        $peminjaman = Peminjaman::create($request->all());
-        return response()->json($peminjaman, 201);
+        $peminjaman->update($validated);
+
+        if ($validated['status'] === 'dikembalikan') {
+            Barang::where('id', $peminjaman->barang_id)->update(['status' => 'tersedia']);
+        }
+
+        return redirect()->route('peminjaman.index')->with('success', 'Data peminjaman diperbarui');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function destroy(Peminjaman $peminjaman)
     {
-        $peminjaman = Peminjaman::findOrFail($id);
-        return response()->json($peminjaman);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        $peminjaman = Peminjaman::findOrFail($id);
-
-        $request->validate([
-            'pengguna_id' => 'sometimes|required|exists:pengguna,id',
-            'barang_id' => 'sometimes|required|exists:barang,id',
-            'tanggal_pinjam' => 'sometimes|required|date',
-            'tanggal_kembali' => 'sometimes|required|date|after:tanggal_pinjam',
-            'tanggal_dikembalikan' => 'nullable|date',
-            'status' => 'sometimes|required|in:pending,dipinjam,dikembalikan',
-            'catatan' => 'nullable|string',
-        ]);
-
-        $peminjaman->update($request->all());
-        return response()->json($peminjaman);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $peminjaman = Peminjaman::findOrFail($id);
         $peminjaman->delete();
-        return response()->json(['message' => 'Peminjaman deleted successfully']);
+        return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil dihapus');
     }
 }

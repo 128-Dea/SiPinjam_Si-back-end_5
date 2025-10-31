@@ -8,24 +8,17 @@ use Illuminate\Validation\Rule;
 
 class BarangController extends Controller
 {
-    /**
-     * GET /barang
-     * Tampilkan daftar barang (paginate biar aman).
-     */
-    public function index(Request $request)
+    public function index()
     {
-        // Bisa ganti ->paginate(15) ke ->get() kalau mau semua
-        $barang = Barang::latest()->paginate(
-            (int) $request->get('per_page', 15)
-        );
-
-        return response()->json($barang);
+        $barang = Barang::latest()->paginate(10);
+        return view('barang.index', compact('barang'));
     }
 
-    /**
-     * POST /barang
-     * Simpan barang baru.
-     */
+    public function create()
+    {
+        return view('barang.create');
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -36,49 +29,32 @@ class BarangController extends Controller
             'status'      => ['required', Rule::in(['tersedia','dipinjam','rusak'])],
         ]);
 
-        $barang = Barang::create($validated);
-
-        return response()->json($barang, 201);
+        Barang::create($validated);
+        return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan');
     }
 
-    /**
-     * GET /barang/{barang}
-     * Detail barang.
-     */
-    public function show(Barang $barang)
+    public function edit(Barang $barang)
     {
-        return response()->json($barang);
+        return view('barang.edit', compact('barang'));
     }
 
-    /**
-     * PUT/PATCH /barang/{barang}
-     * Update data barang.
-     */
     public function update(Request $request, Barang $barang)
     {
         $validated = $request->validate([
-            'nama_barang' => ['sometimes','required','string','max:100'],
+            'nama_barang' => ['required','string','max:100'],
             'deskripsi'   => ['nullable','string'],
             'kategori'    => ['nullable','string','max:50'],
             'lokasi'      => ['nullable','string','max:100'],
-            'status'      => ['sometimes','required', Rule::in(['tersedia','dipinjam','rusak'])],
+            'status'      => ['required', Rule::in(['tersedia','dipinjam','rusak'])],
         ]);
 
         $barang->update($validated);
-
-        return response()->json($barang);
+        return redirect()->route('barang.index')->with('success', 'Barang berhasil diperbarui');
     }
 
-    /**
-     * DELETE /barang/{barang}
-     * Hapus barang.
-     */
     public function destroy(Barang $barang)
     {
         $barang->delete();
-
-        return response()->json([
-            'message' => 'Barang deleted successfully'
-        ]);
+        return redirect()->route('barang.index')->with('success', 'Barang berhasil dihapus');
     }
 }

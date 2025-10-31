@@ -13,4 +13,10 @@ class Pengembalian extends Model
         'denda',
         'catatan'
     ];
+    // App\Models\Pengembalian.php
+public function peminjaman()
+{
+    return $this->belongsTo(Peminjaman::class);
+}
+
 }

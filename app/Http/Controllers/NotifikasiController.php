@@ -3,71 +3,66 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notifikasi;
+use App\Models\Pengguna;
 use Illuminate\Http\Request;
 
 class NotifikasiController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $notifikasis = Notifikasi::all();
-        return response()->json($notifikasis);
+        $notifikasis = Notifikasi::with('pengguna')->latest()->paginate(10);
+        return view('notifikasi.index', compact('notifikasis'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function create()
+    {
+        $pengguna = Pengguna::all();
+        return view('notifikasi.create', compact('pengguna'));
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'pengguna_id' => 'required|exists:pengguna,id',
-            'judul' => 'required|string',
+            'judul' => 'required|string|max:100',
             'pesan' => 'required|string',
             'tipe' => 'required|in:info,warning,error',
             'dibaca' => 'boolean',
         ]);
 
-        $notifikasi = Notifikasi::create($request->all());
-        return response()->json($notifikasi, 201);
+        Notifikasi::create($validated);
+
+        return redirect()->route('notifikasi.index')->with('success', 'Notifikasi berhasil dibuat');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Notifikasi $notifikasi)
     {
-        $notifikasi = Notifikasi::findOrFail($id);
-        return response()->json($notifikasi);
+        return view('notifikasi.show', compact('notifikasi'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function edit(Notifikasi $notifikasi)
     {
-        $notifikasi = Notifikasi::findOrFail($id);
+        $pengguna = Pengguna::all();
+        return view('notifikasi.edit', compact('notifikasi', 'pengguna'));
+    }
 
-        $request->validate([
-            'pengguna_id' => 'sometimes|required|exists:pengguna,id',
-            'judul' => 'sometimes|required|string',
+    public function update(Request $request, Notifikasi $notifikasi)
+    {
+        $validated = $request->validate([
+            'judul' => 'sometimes|required|string|max:100',
             'pesan' => 'sometimes|required|string',
             'tipe' => 'sometimes|required|in:info,warning,error',
             'dibaca' => 'boolean',
         ]);
 
-        $notifikasi->update($request->all());
-        return response()->json($notifikasi);
+        $notifikasi->update($validated);
+
+        return redirect()->route('notifikasi.index')->with('success', 'Notifikasi berhasil diperbarui');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Notifikasi $notifikasi)
     {
-        $notifikasi = Notifikasi::findOrFail($id);
         $notifikasi->delete();
-        return response()->json(['message' => 'Notifikasi deleted successfully']);
+        return redirect()->route('notifikasi.index')->with('success', 'Notifikasi berhasil dihapus');
     }
 }

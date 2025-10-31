@@ -1,13 +1,15 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class Pengguna extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'pengguna';
 
@@ -24,7 +26,7 @@ class Pengguna extends Authenticatable
     ];
 
     /**
-     * Sembunyikan kolom sensitif saat di-serialize.
+     * Kolom sensitif yang disembunyikan saat serialisasi.
      */
     protected $hidden = [
         'password',
@@ -32,10 +34,10 @@ class Pengguna extends Authenticatable
     ];
 
     /**
-     * Casting atribut.
+     * Casting atribut otomatis.
      */
     protected $casts = [
+        // Laravel 10+ mendukung 'hashed' untuk otomatis hash password
         'password' => 'hashed',
-        // 'email_verified_at' => 'datetime',
     ];
 }

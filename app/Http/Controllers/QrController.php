@@ -3,67 +3,62 @@
 namespace App\Http\Controllers;
 
 use App\Models\Qr;
+use App\Models\Barang;
 use Illuminate\Http\Request;
 
 class QrController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $qrs = Qr::all();
-        return response()->json($qrs);
+        $qrs = Qr::with('barang')->latest()->paginate(10);
+        return view('qr.index', compact('qrs'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function create()
+    {
+        $barangs = Barang::all();
+        return view('qr.create', compact('barangs'));
+    }
+
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'barang_id' => 'required|exists:barang,id',
             'kode_qr' => 'required|string|unique:qr,kode_qr',
             'data_qr' => 'required|string',
         ]);
 
-        $qr = Qr::create($request->all());
-        return response()->json($qr, 201);
+        Qr::create($validated);
+        return redirect()->route('qr.index')->with('success', 'QR Code berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Qr $qr)
     {
-        $qr = Qr::findOrFail($id);
-        return response()->json($qr);
+        $qr->load('barang');
+        return view('qr.show', compact('qr'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function edit(Qr $qr)
     {
-        $qr = Qr::findOrFail($id);
+        $barangs = Barang::all();
+        return view('qr.edit', compact('qr', 'barangs'));
+    }
 
-        $request->validate([
+    public function update(Request $request, Qr $qr)
+    {
+        $validated = $request->validate([
             'barang_id' => 'sometimes|required|exists:barang,id',
-            'kode_qr' => 'sometimes|required|string|unique:qr,kode_qr,' . $id,
+            'kode_qr' => 'sometimes|required|string|unique:qr,kode_qr,' . $qr->id,
             'data_qr' => 'sometimes|required|string',
         ]);
 
-        $qr->update($request->all());
-        return response()->json($qr);
+        $qr->update($validated);
+        return redirect()->route('qr.index')->with('success', 'QR Code berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Qr $qr)
     {
-        $qr = Qr::findOrFail($id);
         $qr->delete();
-        return response()->json(['message' => 'Qr deleted successfully']);
+        return redirect()->route('qr.index')->with('success', 'QR Code berhasil dihapus.');
     }
 }

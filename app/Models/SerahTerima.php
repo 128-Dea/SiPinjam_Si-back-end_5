@@ -12,4 +12,14 @@ class SerahTerima extends Model
         'tanggal_serah_terima',
         'catatan'
     ];
+    public function peminjaman()
+{
+    return $this->belongsTo(Peminjaman::class);
+}
+
+public function pengguna()
+{
+    return $this->belongsTo(Pengguna::class);
+}
+
 }

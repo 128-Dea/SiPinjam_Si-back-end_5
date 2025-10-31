@@ -3,22 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use App\Models\Barang;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $services = Service::all();
-        return response()->json($services);
+        $services = Service::with('barang')->latest()->paginate(10);
+        return view('service.index', compact('services'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function create()
+    {
+        $barangs = Barang::all();
+        return view('service.create', compact('barangs'));
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -29,45 +30,19 @@ class ServiceController extends Controller
             'status' => 'required|in:pending,sedang_dikerjakan,selesai',
         ]);
 
-        $service = Service::create($request->all());
-        return response()->json($service, 201);
+        Service::create($request->all());
+        return redirect()->route('service.index')->with('success', 'Data service berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Service $service)
     {
-        $service = Service::findOrFail($id);
-        return response()->json($service);
+        $service->load('barang');
+        return view('service.show', compact('service'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Service $service)
     {
-        $service = Service::findOrFail($id);
-
-        $request->validate([
-            'barang_id' => 'sometimes|required|exists:barang,id',
-            'tanggal_service' => 'sometimes|required|date',
-            'deskripsi_service' => 'sometimes|required|string',
-            'biaya' => 'nullable|numeric|min:0',
-            'status' => 'sometimes|required|in:pending,sedang_dikerjakan,selesai',
-        ]);
-
-        $service->update($request->all());
-        return response()->json($service);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        $service = Service::findOrFail($id);
         $service->delete();
-        return response()->json(['message' => 'Service deleted successfully']);
+        return redirect()->route('service.index')->with('success', 'Data service berhasil dihapus.');
     }
 }

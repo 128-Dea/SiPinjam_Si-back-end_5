@@ -1,23 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Pengembalian;
-use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 
 class PengembalianController extends Controller
 {
     public function index()
     {
-        $pengembalians = Pengembalian::with('peminjaman')->latest()->paginate(10);
-        return view('pengembalian.index', compact('pengembalians'));
-    }
+        $pengembalians = Pengembalian::with('peminjaman')->latest()->get();
 
-    public function create()
-    {
-        $peminjaman = Peminjaman::all();
-        return view('pengembalian.create', compact('peminjaman'));
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar pengembalian berhasil diambil.',
+            'data' => $pengembalians
+        ]);
     }
 
     public function store(Request $request)
@@ -30,21 +29,24 @@ class PengembalianController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        Pengembalian::create($validated);
+        $pengembalian = Pengembalian::create($validated);
 
-        return redirect()->route('pengembalian.index')->with('success', 'Data pengembalian berhasil ditambahkan.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Data pengembalian berhasil disimpan.',
+            'data' => $pengembalian
+        ], 201);
     }
 
     public function show(Pengembalian $pengembalian)
     {
         $pengembalian->load('peminjaman');
-        return view('pengembalian.show', compact('pengembalian'));
-    }
 
-    public function edit(Pengembalian $pengembalian)
-    {
-        $peminjaman = Peminjaman::all();
-        return view('pengembalian.edit', compact('pengembalian', 'peminjaman'));
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail pengembalian berhasil diambil.',
+            'data' => $pengembalian
+        ]);
     }
 
     public function update(Request $request, Pengembalian $pengembalian)
@@ -59,12 +61,20 @@ class PengembalianController extends Controller
 
         $pengembalian->update($validated);
 
-        return redirect()->route('pengembalian.index')->with('success', 'Data pengembalian berhasil diperbarui.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Data pengembalian berhasil diperbarui.',
+            'data' => $pengembalian
+        ]);
     }
 
     public function destroy(Pengembalian $pengembalian)
     {
         $pengembalian->delete();
-        return redirect()->route('pengembalian.index')->with('success', 'Data pengembalian berhasil dihapus.');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data pengembalian berhasil dihapus.'
+        ]);
     }
 }

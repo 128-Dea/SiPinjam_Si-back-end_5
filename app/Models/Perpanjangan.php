@@ -12,4 +12,9 @@ class Perpanjangan extends Model
         'alasan',
         'status'
     ];
+    public function peminjaman()
+{
+    return $this->belongsTo(Peminjaman::class);
+}
+
 }
