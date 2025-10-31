@@ -6,5 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Riwayat extends Model
 {
-    //
+    protected $fillable = [
+        'pengguna_id',
+        'aksi',
+        'detail'
+    ];
 }
