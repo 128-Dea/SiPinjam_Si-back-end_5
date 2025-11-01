@@ -22,12 +22,14 @@
         <div class="row">
             <div class="col-md-2">
                 <div class="list-group">
+                    @if(auth()->user()->role != 'mahasiswa')
                     <a href="{{ route('dashboard.index') }}" class="list-group-item list-group-item-action active">
                         <i class="bi bi-house"></i> Dashboard
                     </a>
                     <a href="{{ route('dashboard.barang.index') }}" class="list-group-item list-group-item-action"><i class="bi bi-box"></i> Barang</a>
                     <a href="{{ route('dashboard.kategori.index') }}" class="list-group-item list-group-item-action"><i class="bi bi-tags"></i> Kategori</a>
                     <a href="{{ route('dashboard.pengguna.index') }}" class="list-group-item list-group-item-action"><i class="bi bi-people"></i> Pengguna</a>
+                    @endif
                     <a href="{{ route('dashboard.peminjaman.index') }}" class="list-group-item list-group-item-action"><i class="bi bi-arrow-right-circle"></i> Peminjaman</a>
                 </div>
             </div>

@@ -12,6 +12,7 @@
                     <form action="{{ route('dashboard.peminjaman.store') }}" method="POST">
                         @csrf
 
+                        @if(auth()->user()->role != 'mahasiswa')
                         <div class="mb-3">
                             <label for="pengguna_id" class="form-label">Pengguna</label>
                             <select class="form-select @error('pengguna_id') is-invalid @enderror" id="pengguna_id" name="pengguna_id" required>
@@ -24,6 +25,9 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        @else
+                        <input type="hidden" name="pengguna_id" value="{{ $pengguna->id }}">
+                        @endif
 
                         <div class="mb-3">
                             <label for="barang_id" class="form-label">Barang</label>
@@ -54,6 +58,7 @@
                             @enderror
                         </div>
 
+                        @if(auth()->user()->role != 'mahasiswa')
                         <div class="mb-3">
                             <label for="status" class="form-label">Status</label>
                             <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
@@ -65,6 +70,9 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        @else
+                        <input type="hidden" name="status" value="pending">
+                        @endif
 
                         <div class="mb-3">
                             <label for="catatan" class="form-label">Catatan</label>
@@ -75,7 +83,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('dashboard.peminjaman') }}" class="btn btn-secondary">Kembali</a>
+                            <a href="{{ route('dashboard.peminjaman.index') }}" class="btn btn-secondary">Kembali</a>
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </div>
                     </form>

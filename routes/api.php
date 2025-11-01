@@ -15,13 +15,15 @@ use App\Http\Controllers\Api\QrController;
 use App\Http\Controllers\Api\RiwayatController;
 use App\Http\Controllers\Api\SerahTerimaController;
 use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\DashboardController as ApiDashboardController;
 
-// ================= AUTH ROUTES =================
-Route::post('/login', [AuthController::class, 'login']);
+// ============ AUTH ============
+Route::post('/login',    [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/logout',   [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-// ================= API CRUD ROUTES =================
+// ============ API CRUD ============
+// endpoint CRUD kamu yang sekarang
 Route::apiResources([
     'barang'          => BarangController::class,
     'kategori'        => KategoriController::class,
@@ -37,3 +39,12 @@ Route::apiResources([
     'serah-terima'    => SerahTerimaController::class,
     'service'         => ServiceController::class,
 ]);
+
+// ============ DASHBOARD API (untuk Flutter) ============
+// butuh token Sanctum biar bisa tahu user & role-nya
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/dashboard',          [ApiDashboardController::class, 'index']);
+    // opsional kalau mau dipanggil terpisah
+    Route::get('/dashboard/admin',    [ApiDashboardController::class, 'admin']);
+    Route::get('/dashboard/mahasiswa',[ApiDashboardController::class, 'mahasiswa']);
+});

@@ -27,21 +27,23 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($pengguna as $pengguna)
+                        @forelse($pengguna as $row)
                         <tr>
-                            <td>{{ $pengguna->id }}</td>
-                            <td>{{ $pengguna->nama }}</td>
-                            <td>{{ $pengguna->email }}</td>
-                            <td>{{ $pengguna->nim }}</td>
-                            <td>{{ $pengguna->jurusan }}</td>
+                            <td>{{ $row->id }}</td>
+                            <td>{{ $row->nama }}</td>
+                            <td>{{ $row->email }}</td>
+                            <td>{{ $row->nim }}</td>
+                            <td>{{ $row->jurusan }}</td>
                             <td>
-                                <span class="badge bg-{{ $pengguna->role == 'admin' ? 'primary' : 'secondary' }}">
-                                    {{ ucfirst($pengguna->role) }}
-                                </span>
+                                @if($row->role === 'petugas')
+                                    <span class="badge bg-primary">Petugas</span>
+                                @else
+                                    <span class="badge bg-info">Mahasiswa</span>
+                                @endif
                             </td>
                             <td>
-                                <a href="{{ route('dashboard.pengguna.edit', $pengguna->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                                <form action="{{ route('dashboard.pengguna.destroy', $pengguna->id) }}" method="POST" class="d-inline">
+                                <a href="{{ route('dashboard.pengguna.edit', $row->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                <form action="{{ route('dashboard.pengguna.destroy', $row->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?')">Hapus</button>
@@ -56,6 +58,8 @@
                     </tbody>
                 </table>
             </div>
+
+            {{-- pagination --}}
             {{ $pengguna->links() }}
         </div>
     </div>

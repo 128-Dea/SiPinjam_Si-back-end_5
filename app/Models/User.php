@@ -23,6 +23,18 @@ class User extends Authenticatable
         'password',
     ];
 
+    protected $appends = ['role'];
+
+    public function getRoleAttribute()
+    {
+        if (str_ends_with($this->email, '@admin.ac.id')) {
+            return 'petugas';
+        } elseif (str_ends_with($this->email, '@mhs.unesa.ac.id')) {
+            return 'mahasiswa';
+        }
+        return null;
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
