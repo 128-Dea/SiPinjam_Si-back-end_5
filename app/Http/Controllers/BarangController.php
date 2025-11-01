@@ -11,12 +11,12 @@ class BarangController extends Controller
     public function index()
     {
         $barang = Barang::latest()->paginate(10);
-        return view('barang.index', compact('barang'));
+        return view('dashboard.barang.index', compact('barang'));
     }
 
     public function create()
     {
-        return view('barang.create');
+        return view('dashboard.barang.create');
     }
 
     public function store(Request $request)
@@ -30,12 +30,12 @@ class BarangController extends Controller
         ]);
 
         Barang::create($validated);
-        return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan');
+        return redirect()->route('dashboard.barang.index')->with('success', 'Barang berhasil ditambahkan');
     }
 
     public function edit(Barang $barang)
     {
-        return view('barang.edit', compact('barang'));
+        return view('dashboard.barang.edit', compact('barang'));
     }
 
     public function update(Request $request, Barang $barang)
@@ -49,12 +49,12 @@ class BarangController extends Controller
         ]);
 
         $barang->update($validated);
-        return redirect()->route('barang.index')->with('success', 'Barang berhasil diperbarui');
+        return redirect()->route('dashboard.barang.index')->with('success', 'Barang berhasil diperbarui');
     }
 
     public function destroy(Barang $barang)
     {
         $barang->delete();
-        return redirect()->route('barang.index')->with('success', 'Barang berhasil dihapus');
+        return redirect()->route('dashboard.barang.index')->with('success', 'Barang berhasil dihapus');
     }
 }
