@@ -13,17 +13,13 @@ class Pengguna extends Authenticatable
 
     // nama tabel
     protected $table = 'pengguna';
-
-    // PK kamu pakai 'id' (default) → jadi gak usah set apa-apa
-
-    // field yang boleh diisi mass assignment
     protected $fillable = [
         'nama',
         'email',
-        'password',   // boleh plain, nanti di-cast ke hashed
+        'password',   
         'nim',
         'jurusan',
-        'role',       // 'mahasiswa' | 'petugas' | 'admin' (kalau kamu mau)
+        'role',      
     ];
 
     // sembunyikan di JSON
@@ -42,14 +38,14 @@ class Pengguna extends Authenticatable
     // normalisasi sebelum simpan / update
     protected static function booted()
     {
-        // pas create
+  
         static::creating(function ($model) {
-            // email jadi lowercase
+            
             if (! empty($model->email)) {
                 $model->email = strtolower($model->email);
             }
 
-            // kalau role gak dikirim → default mahasiswa
+       
             if (empty($model->role)) {
                 $model->role = 'mahasiswa';
             }
@@ -63,11 +59,9 @@ class Pengguna extends Authenticatable
         });
     }
 
-    // ==========================
-    // RELASI (opsional, sesuaikan)
-    // ==========================
-
-    // misal: di tabel peminjaman kolomnya id_peminjam
+    
+    // RELASI 
+  
     public function peminjaman()
     {
         return $this->hasMany(Peminjaman::class, 'id_peminjam', 'id');
