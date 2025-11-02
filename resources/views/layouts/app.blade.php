@@ -99,16 +99,42 @@
                         <i class="bi bi-arrow-right-circle me-1"></i> Peminjaman
                     </a>
 
-                    <!-- Menu lain yang belum aktif -->
-                    <a href="#" class="list-group-item list-group-item-action disabled"><i class="bi bi-arrow-left-circle me-1"></i> Pengembalian</a>
-                    <a href="#" class="list-group-item list-group-item-action disabled"><i class="bi bi-cash me-1"></i> Denda</a>
-                    <a href="#" class="list-group-item list-group-item-action disabled"><i class="bi bi-exclamation-triangle me-1"></i> Keluhan</a>
-                    <a href="#" class="list-group-item list-group-item-action disabled"><i class="bi bi-bell me-1"></i> Notifikasi</a>
-                    <a href="#" class="list-group-item list-group-item-action disabled"><i class="bi bi-calendar-plus me-1"></i> Perpanjangan</a>
-                    <a href="#" class="list-group-item list-group-item-action disabled"><i class="bi bi-qr-code me-1"></i> QR Code</a>
-                    <a href="#" class="list-group-item list-group-item-action disabled"><i class="bi bi-clock-history me-1"></i> Riwayat</a>
-                    <a href="#" class="list-group-item list-group-item-action disabled"><i class="bi bi-handshake me-1"></i> Serah Terima</a>
-                    <a href="#" class="list-group-item list-group-item-action disabled"><i class="bi bi-tools me-1"></i> Service</a>
+                    <a href="{{ route('dashboard.pengembalian.index') }}"
+                       class="list-group-item list-group-item-action {{ request()->routeIs('dashboard.pengembalian*') ? 'active' : '' }}">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Pengembalian
+                    </a>
+                    <a href="{{ route('dashboard.denda.index') }}"
+                       class="list-group-item list-group-item-action {{ request()->routeIs('dashboard.denda*') ? 'active' : '' }}">
+                        <i class="bi bi-cash me-1"></i> Denda
+                    </a>
+                    <a href="{{ route('dashboard.keluhan.index') }}"
+                       class="list-group-item list-group-item-action {{ request()->routeIs('dashboard.keluhan*') ? 'active' : '' }}">
+                        <i class="bi bi-exclamation-triangle me-1"></i> Keluhan
+                    </a>
+                    <a href="{{ route('dashboard.notifikasi.index') }}"
+                       class="list-group-item list-group-item-action {{ request()->routeIs('dashboard.notifikasi*') ? 'active' : '' }}">
+                        <i class="bi bi-bell me-1"></i> Notifikasi
+                    </a>
+                    <a href="{{ route('dashboard.perpanjangan.index') }}"
+                       class="list-group-item list-group-item-action {{ request()->routeIs('dashboard.perpanjangan*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar-plus me-1"></i> Perpanjangan
+                    </a>
+                    <a href="{{ route('dashboard.qr.index') }}"
+                       class="list-group-item list-group-item-action {{ request()->routeIs('dashboard.qr*') ? 'active' : '' }}">
+                        <i class="bi bi-qr-code me-1"></i> QR Code
+                    </a>
+                    <a href="{{ route('dashboard.riwayat.index') }}"
+                       class="list-group-item list-group-item-action {{ request()->routeIs('dashboard.riwayat*') ? 'active' : '' }}">
+                        <i class="bi bi-clock-history me-1"></i> Riwayat
+                    </a>
+                    <a href="{{ route('dashboard.serah-terima.index') }}"
+                       class="list-group-item list-group-item-action {{ request()->routeIs('dashboard.serah-terima*') ? 'active' : '' }}">
+                        <i class="bi bi-handshake me-1"></i> Serah Terima
+                    </a>
+                    <a href="{{ route('dashboard.service.index') }}"
+                       class="list-group-item list-group-item-action {{ request()->routeIs('dashboard.service*') ? 'active' : '' }}">
+                        <i class="bi bi-tools me-1"></i> Service
+                    </a>
                 </div>
             </div>
 

@@ -17,34 +17,42 @@ use App\Http\Controllers\Api\SerahTerimaController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\DashboardController as ApiDashboardController;
 
-// ============ AUTH ============
+//  ===== AUTH TANPA TOKEN =======
+
 Route::post('/login',    [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/logout',   [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-// ============ API CRUD ============
-// endpoint CRUD kamu yang sekarang
-Route::apiResources([
-    'barang'          => BarangController::class,
-    'kategori'        => KategoriController::class,
-    'peminjaman'      => PeminjamanController::class,
-    'pengguna'        => PenggunaController::class,
-    'denda'           => DendaController::class,
-    'keluhan'         => KeluhanController::class,
-    'notifikasi'      => NotifikasiController::class,
-    'pengembalian'    => PengembalianController::class,
-    'perpanjangan'    => PerpanjanganController::class,
-    'qr'              => QrController::class,
-    'riwayat'         => RiwayatController::class,
-    'serah-terima'    => SerahTerimaController::class,
-    'service'         => ServiceController::class,
-]);
+// ======  ROUTE DENGAN TOKEN ====
 
-// ============ DASHBOARD API (untuk Flutter) ============
-// butuh token Sanctum biar bisa tahu user & role-nya
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/dashboard',          [ApiDashboardController::class, 'index']);
-    // opsional kalau mau dipanggil terpisah
-    Route::get('/dashboard/admin',    [ApiDashboardController::class, 'admin']);
-    Route::get('/dashboard/mahasiswa',[ApiDashboardController::class, 'mahasiswa']);
+
+    // ===== AUTH =====
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    // ===== DASHBOARD =====
+    Route::get('/dashboard',           [ApiDashboardController::class, 'index']);
+    Route::get('/dashboard/admin',     [ApiDashboardController::class, 'admin']);
+    Route::get('/dashboard/mahasiswa', [ApiDashboardController::class, 'mahasiswa']);
+
+    // ===== CRUD RESOURCE =====
+    Route::apiResources([
+        'barang'          => BarangController::class,
+        'kategori'        => KategoriController::class,
+        'peminjaman'      => PeminjamanController::class,
+        'pengguna'        => PenggunaController::class,
+        'denda'           => DendaController::class,
+        'keluhan'         => KeluhanController::class,
+        'notifikasi'      => NotifikasiController::class,
+        'pengembalian'    => PengembalianController::class,
+        'perpanjangan'    => PerpanjanganController::class,
+        'qr'              => QrController::class,
+        'riwayat'         => RiwayatController::class,
+        'serah-terima'    => SerahTerimaController::class,
+        'service'         => ServiceController::class,
+    ]);
+
+    // ===== ROUTE TAMBAHAN UNTUK MAHASISWA (DATA SENDIRI) =====
+    Route::get('/peminjaman/me',    [PeminjamanController::class, 'myPeminjaman']);
+    Route::get('/pengembalian/me',  [PengembalianController::class, 'myPengembalian']);
+    Route::get('/perpanjangan/me',  [PerpanjanganController::class, 'myPerpanjangan']);
 });

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Peminjaman extends Model
 {
-    protected $table = 'peminjaman'; 
+    protected $table = 'peminjaman';
 
     protected $fillable = [
         'pengguna_id',
@@ -18,15 +18,26 @@ class Peminjaman extends Model
         'catatan'
     ];
 
-    // Relasi ke Pengguna
+    // supaya bisa langsung format di blade
+    protected $casts = [
+        'tanggal_pinjam'       => 'datetime',
+        'tanggal_kembali'      => 'datetime',
+        'tanggal_dikembalikan' => 'datetime',
+    ];
+
     public function pengguna()
     {
         return $this->belongsTo(Pengguna::class, 'pengguna_id');
     }
 
-    // Relasi ke Barang
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'barang_id');
+    }
+
+    // 👇 penting buat cek di blade & controller
+    public function qr()
+    {
+        return $this->hasOne(\App\Models\Qr::class, 'peminjaman_id');
     }
 }

@@ -13,6 +13,7 @@
                         @csrf
                         @method('PUT')
 
+                        @if(auth()->user()->role == 'mahasiswa')
                         <div class="mb-3">
                             <label for="pengguna_id" class="form-label">Pengguna</label>
                             <select class="form-select @error('pengguna_id') is-invalid @enderror" id="pengguna_id" name="pengguna_id" required>
@@ -64,27 +65,34 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="status" class="form-label">Status</label>
-                            <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
-                                <option value="pending" {{ old('status', $peminjaman->status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="dipinjam" {{ old('status', $peminjaman->status) == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
-                                <option value="dikembalikan" {{ old('status', $peminjaman->status) == 'dikembalikan' ? 'selected' : '' }}>Dikembalikan</option>
-                            </select>
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
                             <label for="catatan" class="form-label">Catatan</label>
                             <textarea class="form-control @error('catatan') is-invalid @enderror" id="catatan" name="catatan" rows="3">{{ old('catatan', $peminjaman->catatan) }}</textarea>
                             @error('catatan')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        @endif
+
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
+                                @if(auth()->user()->role == 'mahasiswa')
+                                <option value="pending" {{ old('status', $peminjaman->status) == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="dipinjam" {{ old('status', $peminjaman->status) == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
+                                @else
+                                <option value="pending" {{ old('status', $peminjaman->status) == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="disetujui" {{ old('status', $peminjaman->status) == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
+                                <option value="ditolak" {{ old('status', $peminjaman->status) == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                <option value="dipinjam" {{ old('status', $peminjaman->status) == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
+                                @endif
+                            </select>
+                            @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('dashboard.peminjaman') }}" class="btn btn-secondary">Kembali</a>
+                            <a href="{{ route('dashboard.peminjaman.index') }}" class="btn btn-secondary">Kembali</a>
                             <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                     </form>

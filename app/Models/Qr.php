@@ -2,27 +2,34 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Qr extends Model
 {
-    use HasFactory;
-
-    protected $table = 'qr'; // pastikan sesuai dengan nama tabel di database
+    protected $table = 'qr';
 
     protected $fillable = [
         'barang_id',
+        'peminjaman_id',
+        'serah_terima_id',
+        'tipe',
         'kode_qr',
         'data_qr',
     ];
 
-    /**
-     * Relasi ke model Barang.
-     * Setiap QR dimiliki oleh satu Barang.
-     */
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'barang_id');
+        return $this->belongsTo(\App\Models\Barang::class, 'barang_id');
+    }
+
+    public function peminjaman()
+    {
+        return $this->belongsTo(\App\Models\Peminjaman::class, 'peminjaman_id');
+    }
+
+    // opsional, kalau kamu nanti punya tabel serah terima
+    public function serahTerima()
+    {
+        return $this->belongsTo(\App\Models\SerahTerima::class, 'serah_terima_id');
     }
 }

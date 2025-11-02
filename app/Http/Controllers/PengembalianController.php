@@ -10,61 +10,65 @@ class PengembalianController extends Controller
 {
     public function index()
     {
-        $pengembalians = Pengembalian::with('peminjaman')->latest()->paginate(10);
-        return view('pengembalian.index', compact('pengembalians'));
+        if (auth()->user()->role == 'mahasiswa') {
+            $pengembalian = Pengembalian::with('peminjaman.barang')
+                ->whereHas('peminjaman', function($q) {
+                    $q->where('pengguna_id', auth()->id());
+                })
+                ->latest()
+                ->paginate(10);
+        } else {
+            $pengembalian = Pengembalian::with('peminjaman.barang', 'peminjaman.pengguna')
+                ->latest()
+                ->paginate(10);
+        }
+
+        return view('dashboard.pengembalian.index', compact('pengembalian'));
     }
 
     public function create()
     {
-        $peminjaman = Peminjaman::all();
-        return view('pengembalian.create', compact('peminjaman'));
+        if (auth()->user()->role != 'mahasiswa') {
+            return redirect()->route('dashboard.pengembalian.index')
+                ->with('error', 'Petugas tidak boleh menambah pengembalian.');
+        }
+
+        $peminjaman = Peminjaman::where('pengguna_id', auth()->id())
+            ->whereIn('status', ['dipinjam', 'disetujui'])
+            ->get();
+
+        return view('dashboard.pengembalian.create', compact('peminjaman'));
     }
 
     public function store(Request $request)
     {
+        if (auth()->user()->role != 'mahasiswa') {
+            return redirect()->route('dashboard.pengembalian.index')
+                ->with('error', 'Petugas tidak boleh menambah pengembalian.');
+        }
+
         $validated = $request->validate([
             'peminjaman_id' => 'required|exists:peminjaman,id',
-            'tanggal_pengembalian' => 'required|date',
-            'kondisi_barang' => 'required|string',
-            'denda' => 'nullable|numeric|min:0',
-            'catatan' => 'nullable|string',
+            'catatan'       => 'nullable|string',
         ]);
 
-        Pengembalian::create($validated);
+        $validated['tanggal_pengembalian'] = now();
 
-        return redirect()->route('pengembalian.index')->with('success', 'Data pengembalian berhasil ditambahkan.');
+        $pengembalian = Pengembalian::create($validated);
+
+        // update peminjaman dan barang
+        $peminjaman = Peminjaman::find($validated['peminjaman_id']);
+        if ($peminjaman) {
+            $peminjaman->update(['status' => 'dikembalikan']);
+            $peminjaman->barang->update(['status' => 'tersedia']);
+        }
+
+        return redirect()->route('dashboard.pengembalian.index')
+            ->with('success', 'Pengembalian berhasil disimpan.');
     }
 
-    public function show(Pengembalian $pengembalian)
-    {
-        $pengembalian->load('peminjaman');
-        return view('pengembalian.show', compact('pengembalian'));
-    }
-
-    public function edit(Pengembalian $pengembalian)
-    {
-        $peminjaman = Peminjaman::all();
-        return view('pengembalian.edit', compact('pengembalian', 'peminjaman'));
-    }
-
-    public function update(Request $request, Pengembalian $pengembalian)
-    {
-        $validated = $request->validate([
-            'peminjaman_id' => 'sometimes|required|exists:peminjaman,id',
-            'tanggal_pengembalian' => 'sometimes|required|date',
-            'kondisi_barang' => 'sometimes|required|string',
-            'denda' => 'nullable|numeric|min:0',
-            'catatan' => 'nullable|string',
-        ]);
-
-        $pengembalian->update($validated);
-
-        return redirect()->route('pengembalian.index')->with('success', 'Data pengembalian berhasil diperbarui.');
-    }
-
-    public function destroy(Pengembalian $pengembalian)
-    {
-        $pengembalian->delete();
-        return redirect()->route('pengembalian.index')->with('success', 'Data pengembalian berhasil dihapus.');
-    }
+    // petugas cuma lihat → edit/destroy kita kunci saja
+    public function edit()  { abort(403); }
+    public function update(){ abort(403); }
+    public function destroy(){ abort(403); }
 }

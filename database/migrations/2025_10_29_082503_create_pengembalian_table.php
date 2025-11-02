@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('peminjaman_id');
             $table->date('tanggal_pengembalian');
-            $table->text('kondisi_barang')->nullable();
-            $table->decimal('denda', 10, 2)->default(0);
             $table->text('catatan')->nullable();
             $table->timestamps();
 

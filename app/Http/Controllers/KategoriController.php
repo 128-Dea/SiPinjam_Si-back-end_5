@@ -9,6 +9,12 @@ class KategoriController extends Controller
 {
     public function index()
     {
+        // Cek role: hanya petugas/admin yang boleh akses seluruh fitur kategori
+        if (auth()->user()->role == 'mahasiswa') {
+            return redirect()->route('dashboard.index')
+                ->with('error', 'Anda tidak memiliki akses ke menu kategori.');
+        }
+
         $kategori = Kategori::latest()->paginate(10);
         return view('dashboard.kategori.index', compact('kategori'));
     }

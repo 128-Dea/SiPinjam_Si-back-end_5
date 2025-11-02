@@ -8,6 +8,20 @@ use Illuminate\Http\Request;
 
 class KategoriController extends Controller
 {
+    public function __construct()
+    {
+        // Semua API ini hanya bisa diakses petugas/admin
+        $this->middleware(function ($request, $next) {
+            if (auth()->user()->role === 'mahasiswa') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akses ditolak. Hanya petugas yang dapat mengelola kategori.',
+                ], 403);
+            }
+            return $next($request);
+        });
+    }
+
     public function index()
     {
         $kategori = Kategori::latest()->get();
