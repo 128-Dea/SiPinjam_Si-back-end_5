@@ -11,8 +11,14 @@ class PeminjamanController extends Controller
 {
     public function index()
     {
-        $peminjamans = Peminjaman::with(['pengguna', 'barang'])->latest()->paginate(10);
-        return view('peminjaman.index', compact('peminjamans'));
+        if (auth()->user()->role == 'mahasiswa') {
+            $pengguna = auth()->user();
+            $barang = Barang::where('status', 'tersedia')->get();
+            return view('dashboard.peminjaman.create', compact('pengguna', 'barang'));
+        } else {
+            $peminjamans = Peminjaman::with(['pengguna', 'barang'])->latest()->paginate(10);
+            return view('dashboard.peminjaman.index', compact('peminjamans'));
+        }
     }
 
     public function create()
@@ -32,13 +38,17 @@ class PeminjamanController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        $validated['status'] = 'dipinjam';
+        if (auth()->user()->role == 'mahasiswa') {
+            $validated['status'] = 'pending';
+        } else {
+            $validated['status'] = 'dipinjam';
+            // update status barang jadi 'dipinjam'
+            Barang::where('id', $validated['barang_id'])->update(['status' => 'dipinjam']);
+        }
+
         Peminjaman::create($validated);
 
-        // update status barang jadi 'dipinjam'
-        Barang::where('id', $validated['barang_id'])->update(['status' => 'dipinjam']);
-
-        return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil ditambahkan');
+        return redirect()->route('dashboard.peminjaman.index')->with('success', 'Peminjaman berhasil ditambahkan');
     }
 
     public function edit(Peminjaman $peminjaman)
@@ -61,14 +71,16 @@ class PeminjamanController extends Controller
 
         if ($validated['status'] === 'dikembalikan') {
             Barang::where('id', $peminjaman->barang_id)->update(['status' => 'tersedia']);
+        } elseif ($validated['status'] === 'dipinjam') {
+            Barang::where('id', $peminjaman->barang_id)->update(['status' => 'dipinjam']);
         }
 
-        return redirect()->route('peminjaman.index')->with('success', 'Data peminjaman diperbarui');
+        return redirect()->route('dashboard.peminjaman.index')->with('success', 'Data peminjaman diperbarui');
     }
 
     public function destroy(Peminjaman $peminjaman)
     {
         $peminjaman->delete();
-        return redirect()->route('peminjaman.index')->with('success', 'Peminjaman berhasil dihapus');
+        return redirect()->route('dashboard.peminjaman.index')->with('success', 'Peminjaman berhasil dihapus');
     }
 }
