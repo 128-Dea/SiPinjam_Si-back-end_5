@@ -94,7 +94,7 @@ class PeminjamanController extends Controller
         }
 
         $validated = $request->validate([
-            'status'               => 'required|in:pending,disetujui,ditolak,dipinjam,dikembalikan,terlambat',
+            'status'               => 'required|in:pending,disetujui,ditolak,dipinjam',
             'tanggal_dikembalikan' => 'nullable|date',
             'catatan'              => 'nullable|string',
         ]);

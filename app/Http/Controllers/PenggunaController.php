@@ -28,8 +28,7 @@ class PenggunaController extends Controller
             'password' => 'required|string|min:5',
             'nim' => 'nullable|string',
             'jurusan' => 'nullable|string',
-            'role' => 'required|in:mahasiswa,admin'
-,
+            'role' => 'required|in:mahasiswa,admin',
         ]);
 
         $data = $request->all();

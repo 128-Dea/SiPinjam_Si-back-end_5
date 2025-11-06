@@ -27,7 +27,6 @@ class Qr extends Model
         return $this->belongsTo(\App\Models\Peminjaman::class, 'peminjaman_id');
     }
 
-    // opsional, kalau kamu nanti punya tabel serah terima
     public function serahTerima()
     {
         return $this->belongsTo(\App\Models\SerahTerima::class, 'serah_terima_id');

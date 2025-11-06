@@ -35,7 +35,6 @@ class Peminjaman extends Model
         return $this->belongsTo(Barang::class, 'barang_id');
     }
 
-    // 👇 penting buat cek di blade & controller
     public function qr()
     {
         return $this->hasOne(\App\Models\Qr::class, 'peminjaman_id');
