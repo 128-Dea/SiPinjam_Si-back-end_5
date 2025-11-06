@@ -26,7 +26,7 @@ class DendaController extends Controller
         return view('denda.create', compact('peminjamans'));
     }
 
-    // Simpan denda (hitungan otomatis jika terlambat)
+    // Simpan denda hitungan otomatis jika terlambat
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -112,7 +112,6 @@ class DendaController extends Controller
         return redirect()->route('denda.index')->with('success','Denda berhasil diperbarui.');
     }
 
-    // Hapus
     public function destroy(Denda $denda)
     {
         $denda->delete();
