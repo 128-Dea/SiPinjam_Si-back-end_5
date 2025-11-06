@@ -84,8 +84,6 @@ class SerahTerimaController extends Controller
                                     : now();
         $st->catatan              = $validated['catatan'] ?? null;
         $st->save();
-
-        // Alihkan kepemilikan peminjaman ke pengguna_baru
         $peminjaman->pengguna_id = $st->pengguna_baru_id;
         $peminjaman->save();
 
@@ -112,7 +110,6 @@ class SerahTerimaController extends Controller
     }
 
     // Petugas READ-ONLY: tidak ada edit/update/destroy.
-    // Kalau route resource sudah ada method tsb, beri guard:
     public function edit()
     {
         return redirect()->route('serah-terima.index')->with('error','Aksi ini tidak diizinkan.');
