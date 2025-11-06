@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Notifikasi extends Model
 {
-    protected $table = 'notifikasi'; // <— penting: bukan notifikasis
+    protected $table = 'notifikasi'; 
 
     protected $fillable = [
         'pengguna_id',
@@ -32,7 +32,6 @@ class Notifikasi extends Model
         return $this->belongsTo(Barang::class, 'barang_id');
     }
 
-    // === Scopes cepat ===
     public function scopeForMahasiswa($q, int $userId)
     {
         return $q->where('role_target', 'mahasiswa')
