@@ -11,7 +11,6 @@ class Pengguna extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    // nama tabel
     protected $table = 'pengguna';
     protected $fillable = [
         'nama',
@@ -30,7 +29,6 @@ class Pengguna extends Authenticatable
 
     // casting otomatis
     protected $casts = [
-        // ini bikin password otomatis di-hash begitu diisi
         'password' => 'hashed',
         'email_verified_at' => 'datetime',
     ];
