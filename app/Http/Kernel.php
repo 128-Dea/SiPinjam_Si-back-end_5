@@ -31,16 +31,11 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            // Jika pakai Sanctum cookie-based SPA, aktifkan baris di bawah:
-            // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
 
-    /**
-     * Alias middleware (bisa dipakai di routes).
-     */
     protected $middlewareAliases = [
         'auth'             => \App\Http\Middleware\Authenticate::class,
         'auth.basic'       => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
