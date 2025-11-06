@@ -3,69 +3,117 @@
 namespace App\Http\Controllers;
 
 use App\Models\Denda;
+use App\Models\Peminjaman;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class DendaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Tampilkan daftar denda (untuk petugas)
     public function index()
     {
-        $dendas = Denda::all();
-        return response()->json($dendas);
+        $dendas = Denda::with(['peminjaman'])->latest()->paginate(10);
+        return view('denda.index', compact('dendas'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Form tambah
+    public function create()
+    {
+        $peminjamans = Peminjaman::with('barang','pengguna')
+            ->latest()->limit(100)->get(); // atau bikin pencarian AJAX
+        return view('denda.create', compact('peminjamans'));
+    }
+
+    // Simpan denda (hitungan otomatis jika terlambat)
     public function store(Request $request)
     {
-        $request->validate([
-            'peminjaman_id' => 'required|exists:peminjaman,id',
-            'jumlah_denda' => 'required|numeric|min:0',
-            'alasan' => 'required|string',
-            'status' => 'required|in:belum_dibayar,dibayar',
+        $validated = $request->validate([
+            'peminjaman_id'    => 'required|exists:peminjaman,id',
+            'jenis_denda'      => 'required|in:terlambat,hilang',
+            'total_denda'      => 'nullable|numeric|min:0', // wajib bila hilang
+            'status_pembayaran'=> 'required|in:belum_dibayar,dibayar',
+            'keterangan'       => 'nullable|string',
         ]);
 
-        $denda = Denda::create($request->all());
-        return response()->json($denda, 201);
+        $p = Peminjaman::with('barang','pengguna')->findOrFail($validated['peminjaman_id']);
+
+        // Hitung otomatis jika terlambat
+        if ($validated['jenis_denda'] === 'terlambat') {
+            $due = Carbon::parse($p->due_at);
+            $end = $p->returned_at ? Carbon::parse($p->returned_at) : now();
+            $menitTelat = $end->greaterThan($due) ? $end->diffInMinutes($due) : 0;
+
+            if ($menitTelat <= 0) {
+                return back()->withErrors(['peminjaman_id'=>'Tidak ada keterlambatan pada peminjaman ini.'])->withInput();
+            }
+
+            $validated['total_denda'] = $menitTelat * 1000; // Rp1.000/menit
+            $validated['keterangan'] = $validated['keterangan'] ?? "Keterlambatan {$menitTelat} menit x Rp1.000";
+        } else {
+            // hilang -> total wajib diisi
+            if (!isset($validated['total_denda']) || $validated['total_denda'] <= 0) {
+                return back()->withErrors(['total_denda'=>'Total denda wajib diisi untuk denda hilang.'])->withInput();
+            }
+        }
+
+        Denda::create($validated);
+
+        return redirect()->route('denda.index')->with('success','Denda berhasil dibuat.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // Detail (opsional)
+    public function show(Denda $denda)
     {
-        $denda = Denda::findOrFail($id);
-        return response()->json($denda);
+        $denda->load('peminjaman');
+        return view('denda.show', compact('denda'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // Form edit
+    public function edit(Denda $denda)
     {
-        $denda = Denda::findOrFail($id);
+        $peminjamans = Peminjaman::with('barang','pengguna')->latest()->limit(100)->get();
+        return view('denda.edit', compact('denda','peminjamans'));
+    }
 
-        $request->validate([
-            'peminjaman_id' => 'sometimes|required|exists:peminjaman,id',
-            'jumlah_denda' => 'sometimes|required|numeric|min:0',
-            'alasan' => 'sometimes|required|string',
-            'status' => 'sometimes|required|in:belum_dibayar,dibayar',
+    // Update
+    public function update(Request $request, Denda $denda)
+    {
+        $validated = $request->validate([
+            'peminjaman_id'    => 'required|exists:peminjaman,id',
+            'jenis_denda'      => 'required|in:terlambat,hilang',
+            'total_denda'      => 'nullable|numeric|min:0',
+            'status_pembayaran'=> 'required|in:belum_dibayar,dibayar',
+            'keterangan'       => 'nullable|string',
         ]);
 
-        $denda->update($request->all());
-        return response()->json($denda);
+        $p = Peminjaman::with('barang','pengguna')->findOrFail($validated['peminjaman_id']);
+
+        if ($validated['jenis_denda'] === 'terlambat') {
+            $due = Carbon::parse($p->due_at);
+            $end = $p->returned_at ? Carbon::parse($p->returned_at) : now();
+            $menitTelat = $end->greaterThan($due) ? $end->diffInMinutes($due) : 0;
+
+            if ($menitTelat <= 0) {
+                return back()->withErrors(['peminjaman_id'=>'Tidak ada keterlambatan pada peminjaman ini.'])->withInput();
+            }
+
+            $validated['total_denda'] = $menitTelat * 1000;
+            $validated['keterangan'] = $validated['keterangan'] ?? "Keterlambatan {$menitTelat} menit x Rp1.000";
+        } else {
+            if (!isset($validated['total_denda']) || $validated['total_denda'] <= 0) {
+                return back()->withErrors(['total_denda'=>'Total denda wajib diisi untuk denda hilang.'])->withInput();
+            }
+        }
+
+        $denda->update($validated);
+
+        return redirect()->route('denda.index')->with('success','Denda berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    // Hapus
+    public function destroy(Denda $denda)
     {
-        $denda = Denda::findOrFail($id);
         $denda->delete();
-        return response()->json(['message' => 'Denda deleted successfully']);
+        return redirect()->route('denda.index')->with('success','Denda berhasil dihapus.');
     }
 }
