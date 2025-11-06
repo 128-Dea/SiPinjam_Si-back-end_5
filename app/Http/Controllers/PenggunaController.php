@@ -8,18 +8,16 @@ use Illuminate\Support\Facades\Hash;
 
 class PenggunaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         $pengguna = Pengguna::all();
         return response()->json($pengguna);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
+     // Store a newly created resource in storage.
+ 
     public function store(Request $request)
     {
         $request->validate([
@@ -38,18 +36,12 @@ class PenggunaController extends Controller
         return response()->json($pengguna, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $pengguna = Pengguna::findOrFail($id);
         return response()->json($pengguna);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $pengguna = Pengguna::findOrFail($id);
@@ -72,9 +64,6 @@ class PenggunaController extends Controller
         return response()->json($pengguna);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $pengguna = Pengguna::findOrFail($id);
