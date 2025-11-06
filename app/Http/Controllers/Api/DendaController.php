@@ -7,6 +7,8 @@ use App\Models\Denda;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Support\RiwayatLogger;
+
 
 class DendaController extends Controller
 {
@@ -71,9 +73,16 @@ class DendaController extends Controller
             'status_pembayaran'=> $statusPembayaran,
             'keterangan'       => $validated['keterangan'] ?? null,
         ]);
+        RiwayatLogger::log(
+    $denda,
+    'denda.create',
+    'Denda '.$denda->jenis_denda.' untuk peminjaman #'.$denda->peminjaman_id.' total Rp '.number_format($denda->total_denda,0,',','.')
+);
+
 
         return response()->json($denda->load('peminjaman'), 201);
     }
+    
 
     public function show($id)
     {
@@ -117,11 +126,18 @@ class DendaController extends Controller
                 ], 422);
             }
         }
+        RiwayatLogger::log(
+    $denda,
+    'denda.update',
+    'Status pembayaran denda #'.$denda->id.' => '.$denda->status_pembayaran
+);
+
 
         $denda->update($validated);
 
         return response()->json($denda->fresh('peminjaman'));
     }
+    
 
     public function destroy($id)
     {

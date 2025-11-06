@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Pengembalian;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
+use App\Support\RiwayatLogger;
+
 
 class PengembalianController extends Controller
 {

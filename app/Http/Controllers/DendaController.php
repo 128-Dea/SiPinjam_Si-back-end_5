@@ -6,6 +6,8 @@ use App\Models\Denda;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Support\RiwayatLogger;
+
 
 class DendaController extends Controller
 {

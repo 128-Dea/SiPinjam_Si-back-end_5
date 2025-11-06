@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Carbon;
+use App\Support\RiwayatLogger;
+
 
 class SerahTerimaController extends Controller
 {
@@ -85,6 +87,13 @@ class SerahTerimaController extends Controller
 
         $st->qr_path = "{$dir}/{$file}";
         $st->save();
+     
+RiwayatLogger::log(
+    $st,
+    'serah_terima.create',
+    'Serah terima dari '.$st->penggunaLama->nama.' ke '.$st->penggunaBaru->nama.' untuk peminjaman #'.$st->peminjaman_id
+);
+
 
         return response()->json([
             'success' => true,

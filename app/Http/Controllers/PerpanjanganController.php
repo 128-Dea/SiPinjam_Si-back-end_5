@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Perpanjangan;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
+use App\Support\RiwayatLogger;
+
 
 class PerpanjanganController extends Controller
 {

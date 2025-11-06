@@ -9,18 +9,23 @@ class Riwayat extends Model
 {
     use HasFactory;
 
-    // Tentukan nama tabel (jaga-jaga kalau bukan plural otomatis)
     protected $table = 'riwayat';
 
     protected $fillable = [
         'pengguna_id',
-        'aksi',
-        'detail',
+        'aksi',    // mis: 'peminjaman.create', 'pengembalian.store', 'perpanjangan.approve', 'serah_terima.create', 'denda.create'
+        'detail',  // keterangan bebas
+        'riwayatable_type',
+        'riwayatable_id',
     ];
 
-    
     public function pengguna()
     {
-        return $this->belongsTo(Pengguna::class);
+        return $this->belongsTo(Pengguna::class, 'pengguna_id');
+    }
+
+    public function riwayatable()
+    {
+        return $this->morphTo();
     }
 }

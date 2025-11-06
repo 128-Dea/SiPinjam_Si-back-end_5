@@ -9,6 +9,8 @@ use App\Models\Notifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use App\Support\RiwayatLogger;
+
 
 class PerpanjanganController extends Controller
 {
@@ -67,6 +69,12 @@ class PerpanjanganController extends Controller
         $validated['status'] = 'pending';
 
         $perpanjangan = Perpanjangan::create($validated)->load('peminjaman.barang', 'peminjaman.pengguna');
+        RiwayatLogger::log(
+    $perpanjangan,
+    'perpanjangan.create',
+    'Ajukan perpanjangan peminjaman #'.$perpanjangan->peminjaman_id
+);
+
 
         // === Notifikasi ke PETUGAS: ada pengajuan perpanjangan baru ===
         Notifikasi::create([
@@ -139,6 +147,12 @@ class PerpanjanganController extends Controller
                 $p->due_at = Carbon::parse($p->due_at)->addMinutes($durasi);
                 $p->save();
             }
+            RiwayatLogger::log(
+    $perpanjangan,
+    'perpanjangan.update',
+    'Status perpanjangan #'.$perpanjangan->id.' => '.$perpanjangan->status
+);
+
 
             Notifikasi::create([
                 'pengguna_id' => $p->pengguna_id,

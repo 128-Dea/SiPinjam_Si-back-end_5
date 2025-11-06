@@ -7,6 +7,8 @@ use App\Models\Peminjaman;
 use App\Models\Barang;
 use App\Models\Qr;
 use Illuminate\Http\Request;
+use App\Support\RiwayatLogger;
+
 
 class PeminjamanController extends Controller
 {
@@ -117,6 +119,14 @@ class PeminjamanController extends Controller
                 ]);
             }
         }
+        RiwayatLogger::log(
+    $peminjaman,
+    'peminjaman.create',
+    'Peminjaman barang "'.$peminjaman->barang->nama_barang.'" oleh '.$peminjaman->pengguna->nama
+);
+RiwayatLogger::log($peminjaman, 'peminjaman.status', 'Status: '.$peminjaman->status);
+
+
 
         return response()->json([
             'success' => true,

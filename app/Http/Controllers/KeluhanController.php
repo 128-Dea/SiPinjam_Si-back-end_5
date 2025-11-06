@@ -6,6 +6,8 @@ use App\Models\Keluhan;
 use App\Models\KeluhanLampiran;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
+use App\Support\RiwayatLogger;
+
 use Illuminate\Support\Facades\Auth;
 
 class KeluhanController extends Controller

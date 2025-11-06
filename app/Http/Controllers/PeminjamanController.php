@@ -7,6 +7,8 @@ use App\Models\Pengguna;
 use App\Models\Barang;
 use App\Models\Qr;
 use Illuminate\Http\Request;
+use App\Support\RiwayatLogger;
+
 
 class PeminjamanController extends Controller
 {

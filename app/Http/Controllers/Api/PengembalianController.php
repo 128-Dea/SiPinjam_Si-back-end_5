@@ -8,6 +8,8 @@ use App\Models\Peminjaman;
 use App\Models\Barang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Support\RiwayatLogger;
+
 
 class PengembalianController extends Controller
 {
@@ -135,4 +137,9 @@ class PengembalianController extends Controller
             'message' => 'Data pengembalian berhasil dihapus.',
         ]);
     }
-}
+}RiwayatLogger::log(
+    $pengembalian,
+    'pengembalian.create',
+    'Pengembalian peminjaman #'.$pengembalian->peminjaman_id.' ('.$pengembalian->peminjaman->barang->nama_barang.')'
+);
+
