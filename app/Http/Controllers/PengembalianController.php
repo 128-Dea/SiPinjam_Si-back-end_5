@@ -69,7 +69,7 @@ class PengembalianController extends Controller
             ->with('success', 'Pengembalian berhasil disimpan.');
     }
 
-    // petugas cuma lihat → edit/destroy kita kunci saja
+    // petugas cuma lihat → edit
     public function edit()  { abort(403); }
     public function update(){ abort(403); }
     public function destroy(){ abort(403); }
