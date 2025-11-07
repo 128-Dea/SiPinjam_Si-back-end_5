@@ -71,6 +71,13 @@ class PengembalianController extends Controller
         $peminjaman->update(['status' => 'dikembalikan']);
         Barang::where('id', $peminjaman->barang_id)->update(['status' => 'tersedia']);
 
+        // log riwayat
+        RiwayatLogger::log(
+            $pengembalian,
+            'pengembalian.create',
+            'Pengembalian peminjaman #'.$pengembalian->peminjaman_id.' ('.$pengembalian->peminjaman->barang->nama_barang.')'
+        );
+
         return response()->json([
             'success' => true,
             'message' => 'Pengembalian berhasil disimpan.',

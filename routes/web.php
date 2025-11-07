@@ -70,7 +70,7 @@ Route::middleware('auth')->prefix('dashboard')->name('dashboard.')->group(functi
     Route::resource('keluhan',       KeluhanController::class)->except(['show']);
     Route::resource('notifikasi',    NotifikasiController::class)->except(['show']);
     Route::resource('qr',            QrController::class)->except(['show']);
-    Route::resource('riwayat',       RiwayatController::class)->except(['show']);
+    Route::resource('riwayat',       RiwayatController::class)->only(['index', 'show']);
     Route::resource('serah-terima',  SerahTerimaController::class)->except(['show']);
     Route::resource('service',       ServiceController::class)->except(['show']);
 });

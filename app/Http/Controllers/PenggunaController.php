@@ -14,9 +14,6 @@ class PenggunaController extends Controller
         $pengguna = Pengguna::all();
         return response()->json($pengguna);
     }
-
-
-     // Store a newly created resource in storage.
  
     public function store(Request $request)
     {

@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    // ==========================
-    // DASHBOARD INDEX
-    // ==========================
+
+    // ==== DASHBOARD INDEX ========
+ 
     public function index()
     {
         $user = auth()->user();
@@ -36,9 +36,9 @@ class DashboardController extends Controller
         ));
     }
 
-    // ==========================
-    // BARANG
-    // ==========================
+
+    // ======== BARANG ==========
+
     public function barang()
     {
         $barang = Barang::paginate(10);
@@ -105,9 +105,9 @@ class DashboardController extends Controller
             ->with('success', 'Barang berhasil dihapus');
     }
 
-    // ==========================
-    // KATEGORI
-    // ==========================
+
+    // ======= KATEGORI =========
+
     public function kategori()
     {
         $kategori = Kategori::paginate(10);
@@ -165,9 +165,9 @@ class DashboardController extends Controller
             ->with('success', 'Kategori berhasil dihapus');
     }
 
-    // ==========================
-    // PENGGUNA
-    // ==========================
+
+    // ===== PENGGUNA ============
+
     public function pengguna()
     {
         $pengguna = Pengguna::paginate(10);
@@ -187,7 +187,6 @@ class DashboardController extends Controller
             'password' => 'required|string|min:5',
             'nim'      => 'nullable|string',
             'jurusan'  => 'nullable|string',
-            // cuma 2 role
             'role'     => 'required|in:mahasiswa,petugas',
         ]);
 
@@ -246,9 +245,9 @@ class DashboardController extends Controller
             ->with('success', 'Pengguna berhasil dihapus');
     }
 
-    // ==========================
-    // PEMINJAMAN
-    // ==========================
+
+    // ======= PEMINJAMAN ===========
+
     public function peminjaman()
     {
         $peminjamans = Peminjaman::with(['pengguna', 'barang'])->paginate(10);
@@ -276,7 +275,7 @@ class DashboardController extends Controller
 
         Peminjaman::create($request->all());
 
-        // set barang jadi dipinjam
+
         Barang::find($request->barang_id)->update(['status' => 'dipinjam']);
 
         return redirect()
